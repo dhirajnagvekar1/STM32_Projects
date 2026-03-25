@@ -20,8 +20,8 @@ The board is equipped as a self-contained IMU and environmental station[cite: 32
 * **Distance:** Time-of-Flight (ToF) sensor (VL53L0X)[cite: 35].
 * **Wireless:** On-board modules for Wi-Fi (802.11 b/g/n), Bluetooth® V4.1, and NFC[cite: 20, 21].
 
-## 🚀 Active Projects
-1. **BMP280 Sensor Integration:** Interfacing an external BMP280 via I2C to capture precise pressure and temperature data.
+## 🚀 Project List
+1. [**Low-BMP280 Sensor Integration:**](./Docs/stm32l4s5vi_intro.pdf) Interfacing an external BMP280 via I2C to capture precise pressure and temperature data.
 2. **BLE Data Transmission:** Using the SPBTLE-RF module to transmit sensor data to an iOS device for real-time monitoring[cite: 20].
 3. **HC-05 Bluetooth Control:** Implementing UART communication to control board peripherals via mobile commands.
 
