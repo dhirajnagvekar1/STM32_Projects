@@ -1,4 +1,4 @@
-## 🛠 Technical Patch Log
+## ⚙️ Technical Patch Log
 During the development of this project, several critical modifications were made to the standard ST Middleware and HAL drivers to ensure stability on the B-L4S5I-IOT01A board.
 
 ### 1. Middleware Fixes (`es_wifi.c`)
