@@ -1,80 +1,169 @@
-# Project3_Bluetooth_with_BlueNRG
+# Interfacing BlueNRG with STM32
 
-## Description
+This project demonstrates how to interface the **ST BlueNRG-MS** (or BlueNRG-2) Bluetooth Low Energy (BLE) network processor with an **BLS4S5I ** microcontroller using the SPI protocol.
 
-This project demonstrates interfacing Bluetooth using the BlueNRG module onboard the STM32L4S5I-IOT01A Discovery Kit. The BlueNRG-MS M0A module communicates with the STM32 M4 cortex processor via the SPI3 interface.
+---
 
-The project is built using STM32CubeMX for configuration and STM32CubeIDE for development and compilation.
+## 🛠 Prerequisites
 
-## Features
+* **Hardware:** * STM32 MCU (e.g., Nucleo-L476RG or F401RE).
+    * BlueNRG expansion board (e.g., [X-NUCLEO-IDB05A2](https://www.st.com/en/ecosystems/x-nucleo-idb05a2.html)).
+* **Software:** * STM32CubeIDE.
+    * X-CUBE-BLE1 expansion pack (Standard HCI layer).
 
-- Bluetooth Low Energy (BLE) communication using BlueNRG-MS
-- SPI interface integration between STM32 and BlueNRG module
-- Basic BLE setup and configuration
+---
 
-## Hardware Requirements
+## 🔌 Hardware Configuration (SPI)
 
-- STM32L4S5I-IOT01A Discovery Kit (includes BlueNRG-MS module)
+The BlueNRG module acts as a SPI slave. Ensure the following pins are mapped correctly in your **.ioc** file:
 
-## Software Requirements
+| BlueNRG Pin | STM32 Peripheral | Role |
+| :--- | :--- | :--- |
+| **MOSI** | SPI Master Out | Data to BlueNRG |
+| **MISO** | SPI Master In | Data from BlueNRG |# Interfacing BlueNRG with STM32
 
-- STM32CubeMX (for project configuration)
-- STM32CubeIDE (for code development and building)
-- Git (for cloning the repository)
+This project demonstrates how to interface the **ST BlueNRG-MS** (or BlueNRG-2) Bluetooth Low Energy (BLE) network processor with an **STM32** microcontroller using the SPI protocol.
 
-## Setup Instructions
+---
 
-1. **Clone the Repository:**
-   ```
-   git clone https://github.com/dhirajnagvekar1/STM32_Projects.git  
-   cd Project3_Bluetooth_with_BlueNRG
-   ```
+## 🛠 Prerequisites
 
-2. **Open in STM32CubeMX:**
-   - Launch STM32CubeMX
-   - Open the `Dhiraj_BlueNRG.ioc` file
-   - Generate the code for your preferred IDE (STM32CubeIDE)
+* **Hardware:** * STM32 MCU (e.g., Nucleo-L476RG or F401RE).
+    * BlueNRG expansion board (e.g., [X-NUCLEO-IDB05A2](https://www.st.com/en/ecosystems/x-nucleo-idb05a2.html)).
+* **Software:** * STM32CubeIDE.
+    * X-CUBE-BLE1 expansion pack (Standard HCI layer).
 
-3. **Import into STM32CubeIDE:**
-   - Open STM32CubeIDE
-   - Import the project as an existing STM32CubeMX project
-   - Select the generated code directory
+---
 
-4. **To read how I setup the cubeMX project (.ioc) refer this() file**
+## 🔌 Hardware Configuration (SPI)
 
+The BlueNRG module acts as a SPI slave. Ensure the following pins are mapped correctly in your **.ioc** file:
 
-## Building the Project
+| BlueNRG Pin | STM32 Peripheral | Role |
+| :--- | :--- | :--- |
+| **MOSI** | SPI Master Out | Data to BlueNRG |
+| **MISO** | SPI Master In | Data from BlueNRG |
+| **SCK** | SPI Clock | Serial Clock |
+| **CSN** | GPIO Output | SPI Chip Select (Active Low) |
+| **IRQ** | GPIO_EXTI | Interrupt from BlueNRG (Data Ready) |
+| **RESET** | GPIO Output | Hardware Reset |
 
-1. In STM32CubeIDE, right-click on the project in the Project Explorer
-2. Select "Build Project"
-3. The build output will be in the `Debug` directory
+### SPI Parameters
+* **Mode:** Full-Duplex Master
+* **Data Size:** 8 Bits
+* **First Bit:** MSB First
+* **CPOL:** Low (0)
+* **CPHA:** 1 Edge (0)
 
-## Flashing and Running
+---
 
-1. Connect the STM32L4S5I-IOT01A board to your computer via USB
-2. In STM32CubeIDE, click the "Run" button or use "Run > Run"
-3. Select the appropriate debug configuration
-4. The program will be flashed to the board and executed
+## 🚀 Software Implementation
 
-## Usage
+### 1. Initialization
+The BlueNRG requires a specific boot sequence. You must initialize the HCI (Host Controller Interface) and then the GATT/GAP layers.
 
-- Once flashed, the board will initialize the BlueNRG module and set up BLE communication. Monitor the output via UART or use a BLE scanner app on your phone to detect the device.
-- You can use the Ligthblue app or the nrfconnect app to subscribe to the data being sent.(You can read it by setting it to UTF-8 encoding)
--   
-## Project Structure
+```c
+/* USER CODE BEGIN 2 */
+// 1. Initialize the BlueNRG hardware interface
+hci_init(user_notify, NULL);
 
-- `Dhiraj_BlueNRG.ioc`: STM32CubeMX project configuration
-- `Core/`: Main application code
-  - `Inc/`: Header files
-  - `Src/`: Source files
-- `Drivers/`: STM32 HAL drivers and BSP
-- `Middlewares/ST/BlueNRG-MS/`: BlueNRG middleware
-- `Debug/`: Build artifacts and makefile
+// 2. Reset BlueNRG-MS
+BlueNRG_RST();
 
-## Contributing
+// 3. Initialize BLE Stack
+aci_gatt_init();
+aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
 
-Feel free to submit issues and pull requests for improvements.
+// 4. Set Device Name
+aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0, 7, (uint8_t*)"STM32");
+/* USER CODE END 2 */# Interfacing BlueNRG with STM32
 
-## License
+This project demonstrates how to interface the **ST BlueNRG-MS** (or BlueNRG-2) Bluetooth Low Energy (BLE) network processor with an **STM32** microcontroller using the SPI protocol.
 
-This project is provided as-is for educational purposes.
+---
+
+## 🛠 Prerequisites
+
+* **Hardware:** * STM32 MCU (e.g., Nucleo-L476RG or F401RE).
+    * BlueNRG expansion board (e.g., [X-NUCLEO-IDB05A2](https://www.st.com/en/ecosystems/x-nucleo-idb05a2.html)).
+* **Software:** * STM32CubeIDE.
+    * X-CUBE-BLE1 expansion pack (Standard HCI layer).
+
+---
+
+## 🔌 Hardware Configuration (SPI)
+
+The BlueNRG module acts as a SPI slave. Ensure the following pins are mapped correctly in your **.ioc** file:
+
+| BlueNRG Pin | STM32 Peripheral | Role |
+| :--- | :--- | :--- |
+| **MOSI** | SPI Master Out | Data to BlueNRG |
+| **MISO** | SPI Master In | Data from BlueNRG |
+| **SCK** | SPI Clock | Serial Clock |
+| **CSN** | GPIO Output | SPI Chip Select (Active Low) |
+| **IRQ** | GPIO_EXTI | Interrupt from BlueNRG (Data Ready) |
+| **RESET** | GPIO Output | Hardware Reset |
+
+### SPI Parameters
+* **Mode:** Full-Duplex Master
+* **Data Size:** 8 Bits
+* **First Bit:** MSB First
+* **CPOL:** Low (0)
+* **CPHA:** 1 Edge (0)
+
+---
+
+## 🚀 Software Implementation
+
+### 1. Initialization
+The BlueNRG requires a specific boot sequence. You must initialize the HCI (Host Controller Interface) and then the GATT/GAP layers.
+
+```c
+/* USER CODE BEGIN 2 */
+// 1. Initialize the BlueNRG hardware interface
+hci_init(user_notify, NULL);
+
+// 2. Reset BlueNRG-MS
+BlueNRG_RST();
+
+// 3. Initialize BLE Stack
+aci_gatt_init();
+aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
+
+// 4. Set Device Name
+aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0, 7, (uint8_t*)"STM32");
+/* USER CODE END 2 */
+| **SCK** | SPI Clock | Serial Clock |
+| **CSN** | GPIO Output | SPI Chip Select (Active Low) |
+| **IRQ** | GPIO_EXTI | Interrupt from BlueNRG (Data Ready) |
+| **RESET** | GPIO Output | Hardware Reset |
+
+### SPI Parameters
+* **Mode:** Full-Duplex Master
+* **Data Size:** 8 Bits
+* **First Bit:** MSB First
+* **CPOL:** Low (0)
+* **CPHA:** 1 Edge (0)
+
+---
+
+## 🚀 Software Implementation
+
+### 1. Initialization
+The BlueNRG requires a specific boot sequence. You must initialize the HCI (Host Controller Interface) and then the GATT/GAP layers.
+
+```c
+/* USER CODE BEGIN 2 */
+// 1. Initialize the BlueNRG hardware interface
+hci_init(user_notify, NULL);
+
+// 2. Reset BlueNRG-MS
+BlueNRG_RST();
+
+// 3. Initialize BLE Stack
+aci_gatt_init();
+aci_gap_init(GAP_PERIPHERAL_ROLE, 0, 0x07, &service_handle, &dev_name_char_handle, &appearance_char_handle);
+
+// 4. Set Device Name
+aci_gatt_update_char_value(service_handle, dev_name_char_handle, 0, 7, (uint8_t*)"STM32");
+/* USER CODE END 2 */
